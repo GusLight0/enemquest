@@ -658,6 +658,53 @@
         .quiz-opt:hover { background: rgba(255,255,255,0.1); }
         .quiz-opt.selected { background: var(--primary); color: #000; font-weight: bold; }
 
+        /* --- MISSION MODAL IMPROVEMENTS --- */
+        .mission-modal-banner {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .mission-desc-box {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.2rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+        
+        .mission-desc-box strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .mission-reward-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, rgba(0, 243, 255, 0.05), transparent);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .mission-reward-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: var(--success);
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+        }
+
         /* --- RESPONSIVIDADE --- */
         @media (max-width: 768px) {
             main { grid-template-columns: 1fr; }
@@ -845,13 +892,23 @@
     <!-- MODAL DE MISSÃO -->
     <div class="modal-overlay" id="mission-modal">
         <div class="modal-content">
-            <h2 id="modal-title" style="color: var(--primary); margin-bottom: 0.5rem;">Título da Missão</h2>
-            <p id="modal-desc" style="color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">Descrição detalhada...</p>
-            <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
-                <strong style="color: var(--secondary);">Recompensa:</strong> <span id="modal-xp">100</span> XP
+            <button class="close-modal-btn" onclick="closeModal()">×</button>
+            <img id="modal-img" src="" class="mission-modal-banner" alt="Mission Banner" style="display:none;">
+            
+            <h2 id="modal-title" style="color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; font-size: 1.4rem;">Título da Missão</h2>
+            
+            <div id="modal-desc" class="mission-desc-box">Descrição detalhada...</div>
+            
+            <div class="mission-reward-box">
+                <div style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem;">
+                    <span style="font-size: 1.5rem;">🏆</span> RECOMPENSA
+                </div>
+                <div class="mission-reward-value">
+                    +<span id="modal-xp">100</span> XP
+                </div>
             </div>
-            <button class="btn" id="complete-btn">CONCLUIR MISSÃO</button>
-            <button class="btn" style="background: transparent; border: 1px solid #555;" onclick="closeModal()">FECHAR</button>
+            
+            <button class="btn" id="complete-btn" style="width: 100%; margin-top: 0;">CONCLUIR MISSÃO</button>
         </div>
     </div>
 
@@ -1009,12 +1066,12 @@
         
         /* --- DADOS DOS VÍDEOS (YOUTUBE STYLE) --- */
         const VIDEOS = [
-            { title: "REDAÇÃO ENEM: O MODELO CORINGA (Serve para tudo)", channel: "Luma e Ponto", desc: "Aprenda um modelo de redação que se adapta a qualquer tema. Estrutura completa com introdução, desenvolvimento e conclusão.", url: "https://www.youtube.com/watch?v=fWdD5R8WzFc" },
-            { title: "MATEMÁTICA BÁSICA - Aula 01: Adição e Subtração", channel: "Prof. Ferretto", desc: "O início de tudo. Domine as operações básicas para não errar bobeira na hora da prova. Essencial para construir uma base sólida.", url: "https://www.youtube.com/watch?v=fsZ6vE_Vjlg" },
-            { title: "COMO COMEÇAR A ESTUDAR PRO ENEM (DO ZERO)", channel: "Felipe Araújo", desc: "Está perdido? Felipe Araújo te guia nos primeiros passos para montar um cronograma eficiente e realista.", url: "https://www.youtube.com/watch?v=3J9p_r_DkX8" },
-            { title: "HISTÓRIA DO BRASIL: RESUMÃO COMPLETO", channel: "Débora Aladim", desc: "Uma revisão completa de toda a história do Brasil, do descobrimento aos dias atuais, focada no que mais cai no ENEM.", url: "https://www.youtube.com/watch?v=ZJjZJjZJjZk" },
+            { title: "MEU MODELO de redação do ENEM 🤯 funciona para QUALQUER TEMA (ATUALIZADO 2026)", channel: "Sarah", desc: "📚 Monte aqui seu cronograma GRATUITAMENTE: https://materiais.questiona.com.br/comunidade-questiona", url: "https://youtu.be/VRQtqA3Fbeo" },
+            { title: "O QUE É O ENEM? COMO SÃO AS PROVAS? O QUE ESTUDAR? | Explicando do Zero", channel: "Manie", desc: `📑 Tudo sobre o Enem: https://bit.ly/32m6Ciw Resolva nossos simulados: https://bit.ly/2XqzSCS`, url: "https://youtu.be/5jq_kcNYzUo" },
+            { title: "DICAS pra você TIRAR NOTA 1000 na REDAÇÃO DO ENEM", channel: "Prof. Noslen", desc: "No vídeo de hoje eu conto para vocês 5 segredos que vão te poupar de perder pontos na redação do ENEM e te deixar ainda mais perto de alcançar a tão sonhada nota 1000!", url: "https://youtu.be/TuBKsV3lSQc" },
+            { title: "PASSAR NO ENEM é bem fácil, na real", channel: "bem fácil, na real", desc: "Você provavelmente deveria estar estudando… então vem comigo aprender a estudar do jeito certo. Sem fórmula milagrosa: foco, esforço e sono — na prática — pra transformar procrastinação em resultado real no ENEM ou qualquer prova. No final, você sai com um plano simples e direto. Bora?", url: "https://youtu.be/lwuFcjj-yg8" },
+            { title: "O QUE É SISU? Como entrar em uma universidade pública fazendo o Enem | Explicando do Zero", channel: "Manie", desc: "O SiSU é o sistema no qual os candidatos usam a nota do Enem para disputar vagas de cursos de graduação das universidades públicas. Todo ano, o MEC coloca 300 mil vagas gratuitas nas universidades públicas com ingresso pela nota do Enem. O SiSU acontece duas vezes por ano e cada  período de inscrições geralmente dura quatro dias.", url: "https://youtu.be/qImFDtzNm2E" },
         ];
-
         const LEVELS = [
             {
                 id: 1,
@@ -1046,9 +1103,9 @@
                 desc: "Não vence quem sabe mais, vence quem faz a melhor prova.",
                 baseScore: 700,
                 missions: [
-                    { id: 301, title: "Simulado Cronometrado (TRI)", image: "./assets/img/missao-301.png", desc: "Prova 2021 completa. <strong>Tempo rígido: 5h30min.</strong><br><br>• Use máscara (se quiser simular o pior cenário).<br>• Sem pausas para celular.<br>• Água e lanche na mesa.<br>• Sinta o cansaço e aprenda a lidar com ele.", type: "exam", xp: 600 },
-                    { id: 302, title: "A Arte de Pular (TRI)", image: "./assets/img/missao-302.png", desc: "O ENEM usa a Teoria de Resposta ao Item. Acertar difícil e errar fácil abaixa sua nota.<br><br><strong>Técnica das 3 Passadas:</strong><br>1. Leia e faça as fáceis imediatamente.<br>2. Marque as médias para fazer depois.<br>3. As difíceis/trabalhosas ficam pro final (ou chute consciente).<br><strong>Nunca trave mais de 3 min numa questão.</strong>", type: "strategy", xp: 300 },
-                    { id: 303, title: "Redação: O Pulo pro 900+", image: "./assets/img/missao-303.png", desc: "Refine suas competências:<br><br>• <strong>C1:</strong> Crase, vírgula e concordância.<br>• <strong>C2:</strong> Não tangencie o tema.<br>• <strong>C3:</strong> Projeto de texto (seus argumentos conversam?).<br>• <strong>C4:</strong> Use conectivos (Nesse viés, Ademais, Portanto) em todo início de parágrafo.", type: "review", xp: 400 }
+                    { id: 301, title: "Simulado Cronometrado (TRI)", image: "./assets/img/lvl3-1.png", desc: "Prova 2021 completa. <strong>Tempo rígido: 5h30min.</strong><br><br>• Use máscara (se quiser simular o pior cenário).<br>• Sem pausas para celular.<br>• Água e lanche na mesa.<br>• Sinta o cansaço e aprenda a lidar com ele.", type: "exam", xp: 600 },
+                    { id: 302, title: "A Arte de Pular (TRI)", image: "./assets/img/lvl3-2.png", desc: "O ENEM usa a Teoria de Resposta ao Item. Acertar difícil e errar fácil abaixa sua nota.<br><br><strong>Técnica das 3 Passadas:</strong><br>1. Leia e faça as fáceis imediatamente.<br>2. Marque as médias para fazer depois.<br>3. As difíceis/trabalhosas ficam pro final (ou chute consciente).<br><strong>Nunca trave mais de 3 min numa questão.</strong>", type: "strategy", xp: 300 },
+                    { id: 303, title: "Redação: O Pulo pro 900+", image: "./assets/img/lvl3-3.png", desc: "Refine suas competências:<br><br>• <strong>C1:</strong> Crase, vírgula e concordância.<br>• <strong>C2:</strong> Não tangencie o tema.<br>• <strong>C3:</strong> Projeto de texto (seus argumentos conversam?).<br>• <strong>C4:</strong> Use conectivos (Nesse viés, Ademais, Portanto) em todo início de parágrafo.", type: "review", xp: 400 }
                 ]
             },
             {
@@ -1057,9 +1114,9 @@
                 desc: "Refinamento final. Transforme fraquezas em pontos.",
                 baseScore: 760,
                 missions: [
-                    { id: 401, title: "Maratona de Resistência", image: "./assets/img/missao-401.png", desc: "Simule um final de semana real (Sábado e Domingo seguidos).<br><br>O objetivo aqui é físico e mental. Teste qual lanche te dá energia sem dar sono. Teste sua postura na cadeira. A dor nas costas tira mais pontos que a falta de estudo.", type: "exam", xp: 1000 },
-                    { id: 402, title: "Revisão Espaçada Total", image: "./assets/img/missao-402.png", desc: "Pegue todos os seus flashcards e resumos.<br><br>A Curva do Esquecimento é cruel. O que você estudou no Nível 1 já está sumindo. Traga tudo de volta à memória de curto prazo agora.", type: "review", xp: 500 },
-                    { id: 403, title: "O Caderno de Erros", image: "./assets/img/missao-403.png", desc: "Pegue suas planilhas de erros dos Níveis 1, 2 e 3.<br><br><strong>Refaça APENAS as questões que você errou.</strong><br>Entender um erro antigo vale por 10 acertos novos. Transforme sua maior fraqueza em força.", type: "strategy", xp: 600 }
+                    { id: 401, title: "Maratona de Resistência", image: "./assets/img/lvl4-1.png", desc: "Simule um final de semana real (Sábado e Domingo seguidos).<br><br>O objetivo aqui é físico e mental. Teste qual lanche te dá energia sem dar sono. Teste sua postura na cadeira. A dor nas costas tira mais pontos que a falta de estudo.", type: "exam", xp: 1000 },
+                    { id: 402, title: "Revisão Espaçada Total", image: "./assets/img/lvl4-2.png", desc: "Pegue todos os seus flashcards e resumos.<br><br>A Curva do Esquecimento é cruel. O que você estudou no Nível 1 já está sumindo. Traga tudo de volta à memória de curto prazo agora.", type: "review", xp: 500 },
+                    { id: 403, title: "O Caderno de Erros", image: "./assets/img/lvl4-3.png", desc: "Pegue suas planilhas de erros dos Níveis 1, 2 e 3.<br><br><strong>Refaça APENAS as questões que você errou.</strong><br>Entender um erro antigo vale por 10 acertos novos. Transforme sua maior fraqueza em força.", type: "strategy", xp: 600 }
                 ]
             },
             {
@@ -1068,7 +1125,7 @@
                 desc: "O trabalho duro já foi feito. Agora é controle emocional.",
                 baseScore: 800,
                 missions: [
-                    { id: 501, title: "Polimento Final", image: "./assets/img/missao-501.png", desc: "<strong>Proibido aprender matéria nova.</strong> Isso só gera ansiedade.<br><br>Apenas releia fórmulas, conceitos chave e repertórios de redação. Confie no que você já construiu.", type: "review", xp: 200 },
+                    { id: 501, title: "Polimento Final", image: "./assets/img/lvl5-1.png", desc: "<strong>Proibido aprender matéria nova.</strong> Isso só gera ansiedade.<br><br>Apenas releia fórmulas, conceitos chave e repertórios de redação. Confie no que você já construiu.", type: "review", xp: 200 },
                     { id: 502, title: "Kit de Sobrevivência", image: "./assets/img/missao-502.png", desc: "• Caneta preta tubo transparente (leve 3).<br>• Documento original com foto.<br>• Cartão de confirmação impresso.<br>• Água sem rótulo.<br>• Lanche prático (chocolate amargo, castanhas).<br>• Verifique o trajeto no Google Maps.", type: "strategy", xp: 100 },
                     { id: 503, title: "O Dia Zero", image: "./assets/img/missao-503.png", desc: "Sábado pré-prova.<br><br><strong>ZERO ESTUDO.</strong><br>Seu cérebro precisa consolidar as sinapses. Veja um filme leve, coma algo saudável, durma cedo. A prova é amanhã e você está pronto.", type: "strategy", xp: 500 }
                 ]
@@ -1590,6 +1647,12 @@
             document.getElementById('modal-title').innerText = mission.title;
             document.getElementById('modal-desc').innerHTML = mission.desc;
             document.getElementById('modal-xp').innerText = mission.xp;
+
+            const imgEl = document.getElementById('modal-img');
+            if(imgEl) {
+                imgEl.src = mission.image;
+                imgEl.style.display = 'block';
+            }
             
             const btn = document.getElementById('complete-btn');
             
