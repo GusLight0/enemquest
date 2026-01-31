@@ -280,7 +280,7 @@
             opacity: 0.5;
             transition: opacity 0.3s;
             filter: blur(1px);
-            pointer-events: none;
+            /* pointer-events: none; Removido para permitir controle granular por missão */
         }
 
         .level-section.active, .level-section.completed {
@@ -289,9 +289,9 @@
             pointer-events: auto;
         }
 
-        .level-section:not(.active) .mission-card {
+        /* .level-section:not(.active) .mission-card {
             pointer-events: none;
-        }
+        } Removido pois agora usamos a classe .locked */
 
         .level-header {
             display: flex;
@@ -321,7 +321,8 @@
         /* --- ESTILO YOUTUBE (VÍDEOS) --- */
         .video-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            /* Usa preenchimento automático para criar colunas responsivas sem media queries explícitas */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.5rem;
         }
 
@@ -329,44 +330,100 @@
             background: rgba(30, 30, 40, 0.4);
             border-radius: 12px;
             overflow: hidden;
-            transition: 0.3s;
+            transition: 0.3s ease;
             cursor: pointer;
             border: 1px solid transparent;
+            position: relative; /* Para o ícone de play */
         }
 
         .video-card:hover {
-            transform: translateY(-5px);
-            background: rgba(30, 30, 40, 0.8);
-            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-8px);
+            background: rgba(30, 30, 40, 0.9);
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(0, 243, 255, 0.1);
+        }
+
+        /* Ícone de Play que aparece no hover */
+        .video-card::before {
+            content: '▶';
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            font-size: 3.5rem;
+            color: #fff;
+            background: rgba(0,0,0,0.6);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 70px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 5;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .video-card:hover::before {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .video-thumb-wrapper {
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .video-thumb {
             width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
+            height: 100%;
             object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .video-card:hover .video-thumb {
+            transform: scale(1.05);
         }
 
         .video-info {
-            padding: 1rem;
+            padding: 1rem 1.2rem;
         }
 
         .video-title {
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            margin-bottom: 0.3rem;
+            font-size: 1rem;
             line-height: 1.4;
+            margin-bottom: 0.5rem;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        .video-meta { color: var(--text-muted); font-size: 0.85rem; }
+        .video-meta { 
+            color: var(--text-muted); 
+            font-size: 0.85rem; 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .video-meta::before {
+            content: '📺';
+            opacity: 0.7;
+        }
 
         /* --- GRID DE MISSÕES (NOVO LAYOUT) --- */
         .missions-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr); /* 4 colunas no desktop */
             gap: 1.5rem;
+            /* Layout responsivo que cria colunas de no mínimo 260px, evitando que fiquem esticadas ou espremidas */
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem; /* Aumenta o espaçamento entre os cards */
             margin-top: 1rem;
         }
 
@@ -378,6 +435,7 @@
             border-radius: 12px;
             padding: 0; /* Remove padding para a imagem encostar na borda */
             height: 380px; /* Altura aumentada para estilo "Post/Retrato" */
+            padding: 0;
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             cursor: pointer;
             position: relative;
@@ -391,9 +449,42 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
+        .mission-card.locked {
+            opacity: 0.4;
+            filter: grayscale(0.9);
+            pointer-events: none;
+            cursor: not-allowed;
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .mission-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            z-index: 10;
+            text-shadow: 0 0 20px #000;
+        }
+
+        .mission-duration {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+        .mission-duration span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
         .mission-img {
             width: 100%;
             height: 240px; /* Imagem bem maior (destaque) */
+            height: 200px; /* Altura da imagem ajustada para melhor proporção */
             object-fit: cover;
             background: #222;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -498,6 +589,62 @@
 
         .close-modal-btn:hover { color: #fff; }
 
+        /* --- ESTILO DO PLAYER DE VÍDEO (MELHORADO) --- */
+        #video-player-modal .modal-content {
+            max-width: 900px;
+            width: 95%;
+            padding: 0;
+            overflow-y: auto;
+            background: var(--bg-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-iframe-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            width: 100%;
+            background: #000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .video-iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .video-player-info {
+            padding: 1.5rem 2rem;
+        }
+
+        #video-player-title {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            line-height: 1.3;
+        }
+
+        #video-player-channel {
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        #video-player-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding-right: 10px;
+        }
+
         /* --- ESTILO DO PLAYER DE VÍDEO --- */
         .close-video-btn {
             position: absolute;
@@ -518,10 +665,6 @@
             transition: 0.3s;
         }
         .close-video-btn:hover { background: var(--primary); color: #000; transform: scale(1.1); }
-
-        #profile-modal .modal-content {
-            max-width: 700px; /* Reduzido um pouco para não ficar tão largo */
-        }
 
         .btn {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
@@ -751,11 +894,21 @@
             .score-badge { font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem; }
 
             /* Grid de Missões Mobile (2 colunas) */
-            .missions-grid, .video-grid {
+            .missions-grid {
                 grid-template-columns: repeat(2, 1fr); /* 2 colunas no celular */
                 gap: 0.8rem;
             }
+            .missions-grid { gap: 1.5rem; }
+            /* O grid de vídeos agora é responsivo por padrão com auto-fill, mas podemos ajustar o gap */
+            .video-grid {
+                gap: 1rem;
+            }
+            .video-card::before {
+                width: 50px; height: 50px; font-size: 2.5rem; line-height: 50px;
+            }
+
             .mission-card { height: auto; min-height: 260px; }
+            .mission-card { /* Altura agora é automática */ }
             .mission-img { height: 140px; }
             .mission-content { padding: 0.6rem; }
             .mission-card h4 { 
@@ -770,6 +923,15 @@
             /* Modais Ajustados */
             .modal-content { padding: 1rem; width: 90%; max-height: 85vh; }
             .modal-content h2 { font-size: 1.1rem; margin-bottom: 0.5rem !important; }
+            .video-player-info {
+                padding: 1rem 1.5rem;
+            }
+            #video-player-title {
+                font-size: 1.2rem;
+            }
+            #video-player-desc {
+                font-size: 0.9rem;
+            }
             .modal-content p { font-size: 0.85rem; line-height: 1.4; margin-bottom: 1rem !important; }
             
             /* Profile Mobile Optimization */
@@ -792,12 +954,10 @@
 
         /* Telas muito pequenas (iPhone SE, etc) */
         @media (max-width: 480px) {
-            .video-grid {
-                grid-template-columns: 1fr;
-            }
             .missions-grid {
-                grid-template-columns: repeat(2, 1fr); /* Força 2 colunas nas tarefas */
+                grid-template-columns: repeat(1, 1fr); /* Força 1 coluna nas tarefas para melhor leitura */
             }
+            /* O grid de missões já se ajusta para 1 coluna naturalmente com auto-fit */
         }
 
         @media (max-width: 350px) {
@@ -914,14 +1074,15 @@
 
     <!-- MODAL DE VÍDEO (PLAYER) -->
     <div class="modal-overlay" id="video-player-modal">
-        <div class="modal-content" style="max-width: 800px; width: 95%; text-align: left; padding: 0; overflow: hidden; background: #0a0a0f;">
+        <div class="modal-content">
             <button class="close-video-btn" onclick="closeVideoPlayer()">×</button>
-            <div style="position: relative; padding-bottom: 56.25%; height: 0; width: 100%; background: #000;">
-                <iframe id="video-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="video-iframe-container">
+                <iframe id="video-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
-            <div style="padding: 1.5rem;">
-                <h2 id="video-player-title" style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.2rem;">Título do Vídeo</h2>
-                <p id="video-player-desc" style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Descrição do vídeo...</p>
+            <div class="video-player-info">
+                <h2 id="video-player-title">Título do Vídeo</h2>
+                <p id="video-player-channel"></p>
+                <p id="video-player-desc">Descrição do vídeo...</p>
             </div>
         </div>
     </div>
@@ -1079,10 +1240,10 @@
                 desc: "Antes de construir o prédio, sonde o terreno. Descubra onde você está.",
                 baseScore: 500,
                 missions: [
-                    { id: 101, title: "Simulado Diagnóstico (Raio-X)", image: "./assets/img/tarefa1.png", desc: "<strong>Objetivo:</strong> Entender seu nível atual sem pressão de tempo.<br><br>1. Imprima a prova do ENEM 2020 (Dia 1).<br>2. Faça em ambiente silencioso, mas <strong>sem cronômetro</strong>.<br>3. Seja honesto: não chute. Se não sabe, deixe em branco.<br>4. Este resultado será seu 'Ponto Zero' para medir evolução.", type: "exam", xp: 500 },
-                    { id: 102, title: "Mapeamento de Lacunas", image: "./assets/img/tarefa2.png", desc: "<strong>Não basta corrigir!</strong> Crie uma planilha com 3 colunas para cada erro:<br><br>1. <strong>Conteúdo:</strong> Eu não sabia a matéria?<br>2. <strong>Interpretação:</strong> Eu sabia, mas não entendi o texto?<br>3. <strong>Atenção:</strong> Errei conta ou leitura rápida?<br><br><em>Dica: Ataque primeiro os erros de conteúdo base.</em>", type: "strategy", xp: 200 },
-                    { id: 103, title: "O Cronograma Realista", image: "./assets/img/tarefa3.png", desc: "Esqueça cronogramas de 12h. Monte um sustentável:<br><br>• Defina <strong>Blocos de Estudo</strong> de 1h30min.<br>• Intercale matérias opostas (ex: Mat e Hist) para descansar o cérebro.<br>• Deixe o domingo livre ou para simulados.<br>• <strong>Meta:</strong> Cumprir 80% do planejado é melhor que 0% do perfeito.", type: "strategy", xp: 150 },
-                    { id: 104, title: "Matemática: O Alicerce", image: "./assets/img/tarefa4.png", desc: "O ENEM ama o básico. Antes de Logaritmo, domine:<br><br>✅ Regra de Três (Simples e Composta)<br>✅ Porcentagem e Juros<br>✅ Frações e Decimais<br>✅ Conversão de Unidades (km para m, h para s)<br><br><strong>Missão:</strong> Resolver 50 questões apenas desses temas.", type: "review", xp: 300 }
+                    { id: 101, title: "Simulado Diagnóstico (Raio-X)", image: "./assets/img/tarefa1.png", desc: "<strong>Objetivo:</strong> Entender seu nível atual sem pressão de tempo.<br><br>1. Imprima a prova do ENEM 2020 (Dia 1).<br>2. Faça em ambiente silencioso, mas <strong>sem cronômetro</strong>.<br>3. Seja honesto: não chute. Se não sabe, deixe em branco.<br>4. Este resultado será seu 'Ponto Zero' para medir evolução.", type: "exam", xp: 500, duration: "4h 30min" },
+                    { id: 102, title: "Mapeamento de Lacunas", image: "./assets/img/tarefa2.png", desc: "<strong>Não basta corrigir!</strong> Crie uma planilha com 3 colunas para cada erro:<br><br>1. <strong>Conteúdo:</strong> Eu não sabia a matéria?<br>2. <strong>Interpretação:</strong> Eu sabia, mas não entendi o texto?<br>3. <strong>Atenção:</strong> Errei conta ou leitura rápida?<br><br><em>Dica: Ataque primeiro os erros de conteúdo base.</em>", type: "strategy", xp: 200, duration: "1h" },
+                    { id: 103, title: "O Cronograma Realista", image: "./assets/img/tarefa3.png", desc: "Esqueça cronogramas de 12h. Monte um sustentável:<br><br>• Defina <strong>Blocos de Estudo</strong> de 1h30min.<br>• Intercale matérias opostas (ex: Mat e Hist) para descansar o cérebro.<br>• Deixe o domingo livre ou para simulados.<br>• <strong>Meta:</strong> Cumprir 80% do planejado é melhor que 0% do perfeito.", type: "strategy", xp: 150, duration: "45min" },
+                    { id: 104, title: "Matemática: O Alicerce", image: "./assets/img/tarefa4.png", desc: "O ENEM ama o básico. Antes de Logaritmo, domine:<br><br>✅ Regra de Três (Simples e Composta)<br>✅ Porcentagem e Juros<br>✅ Frações e Decimais<br>✅ Conversão de Unidades (km para m, h para s)<br><br><strong>Missão:</strong> Resolver 50 questões apenas desses temas.", type: "review", xp: 300, duration: "2h" }
                 ]
             },
             {
@@ -1091,10 +1252,10 @@
                 desc: "Aprofunde a teoria e comece a entender a linguagem da prova.",
                 baseScore: 620,
                 missions: [
-                    { id: 201, title: "Laboratório de Humanas", image: "./assets/img/lvl2-1.png", desc: "Resolver prova de Humanas 2018.<br><br><strong>Foco:</strong> Interpretação de Texto e Gêneros Textuais.<br>Ao corrigir, leia a resolução comentada de TODAS as questões, inclusive as que acertou. Entenda por que a alternativa B está errada, não só por que a A está certa.", type: "exam", xp: 400 },
-                    { id: 202, title: "A Fórmula da Redação", image: "./assets/img/lvl2-2.png", desc: "Não reinvente a roda. Estruture seu esqueleto:<br><br>• <strong>Intro:</strong> Contexto + Tese + 2 Argumentos.<br>• <strong>D1 e D2:</strong> Tópico Frasal + Repertório + Análise Crítica.<br>• <strong>Conclusão:</strong> Agente + Ação + Meio + Efeito + Detalhamento.<br><br><strong>Missão:</strong> Escreva 2 redações focando apenas nessa estrutura.", type: "review", xp: 300 },
-                    { id: 203, title: "Natureza: O Que Sempre Cai", image: "./assets/img/lvl2-3.png", desc: "Ecologia representa ~30% da prova de Biologia.<br><br><strong>Domine:</strong><br>1. Ciclos Biogeoquímicos (Nitrogênio e Carbono)<br>2. Relações Ecológicas (quem ganha/perde?)<br>3. Impactos Ambientais (Lixo, Eutrofização).<br><br>Resolva 20 questões específicas disso.", type: "review", xp: 250 },
-                    { id: 204, title: "Flashcards & Active Recall", image: "./assets/img/lvl2-4.png", desc: "Pare de apenas ler resumos. Force seu cérebro a lembrar.<br><br>Crie 50 flashcards (Anki ou papel) para:<br>• Fórmulas de Física (Cinemática/Elétrica)<br>• Funções Orgânicas (Química)<br>• Datas/Eventos chave de História.<br>Revise diariamente por 15 min.", type: "strategy", xp: 200 }
+                    { id: 201, title: "Laboratório de Humanas", image: "./assets/img/lvl2-1.png", desc: "Resolver prova de Humanas 2018.<br><br><strong>Foco:</strong> Interpretação de Texto e Gêneros Textuais.<br>Ao corrigir, leia a resolução comentada de TODAS as questões, inclusive as que acertou. Entenda por que a alternativa B está errada, não só por que a A está certa.", type: "exam", xp: 400, duration: "3h" },
+                    { id: 202, title: "A Fórmula da Redação", image: "./assets/img/lvl2-2.png", desc: "Não reinvente a roda. Estruture seu esqueleto:<br><br>• <strong>Intro:</strong> Contexto + Tese + 2 Argumentos.<br>• <strong>D1 e D2:</strong> Tópico Frasal + Repertório + Análise Crítica.<br>• <strong>Conclusão:</strong> Agente + Ação + Meio + Efeito + Detalhamento.<br><br><strong>Missão:</strong> Escreva 2 redações focando apenas nessa estrutura.", type: "review", xp: 300, duration: "2h" },
+                    { id: 203, title: "Natureza: O Que Sempre Cai", image: "./assets/img/lvl2-3.png", desc: "Ecologia representa ~30% da prova de Biologia.<br><br><strong>Domine:</strong><br>1. Ciclos Biogeoquímicos (Nitrogênio e Carbono)<br>2. Relações Ecológicas (quem ganha/perde?)<br>3. Impactos Ambientais (Lixo, Eutrofização).<br><br>Resolva 20 questões específicas disso.", type: "review", xp: 250, duration: "1h 30min" },
+                    { id: 204, title: "Flashcards & Active Recall", image: "./assets/img/lvl2-4.png", desc: "Pare de apenas ler resumos. Force seu cérebro a lembrar.<br><br>Crie 50 flashcards (Anki ou papel) para:<br>• Fórmulas de Física (Cinemática/Elétrica)<br>• Funções Orgânicas (Química)<br>• Datas/Eventos chave de História.<br>Revise diariamente por 15 min.", type: "strategy", xp: 200, duration: "1h" }
                 ]
             },
             {
@@ -1103,9 +1264,9 @@
                 desc: "Não vence quem sabe mais, vence quem faz a melhor prova.",
                 baseScore: 700,
                 missions: [
-                    { id: 301, title: "Simulado Cronometrado (TRI)", image: "./assets/img/lvl3-1.png", desc: "Prova 2021 completa. <strong>Tempo rígido: 5h30min.</strong><br><br>• Use máscara (se quiser simular o pior cenário).<br>• Sem pausas para celular.<br>• Água e lanche na mesa.<br>• Sinta o cansaço e aprenda a lidar com ele.", type: "exam", xp: 600 },
-                    { id: 302, title: "A Arte de Pular (TRI)", image: "./assets/img/lvl3-2.png", desc: "O ENEM usa a Teoria de Resposta ao Item. Acertar difícil e errar fácil abaixa sua nota.<br><br><strong>Técnica das 3 Passadas:</strong><br>1. Leia e faça as fáceis imediatamente.<br>2. Marque as médias para fazer depois.<br>3. As difíceis/trabalhosas ficam pro final (ou chute consciente).<br><strong>Nunca trave mais de 3 min numa questão.</strong>", type: "strategy", xp: 300 },
-                    { id: 303, title: "Redação: O Pulo pro 900+", image: "./assets/img/lvl3-3.png", desc: "Refine suas competências:<br><br>• <strong>C1:</strong> Crase, vírgula e concordância.<br>• <strong>C2:</strong> Não tangencie o tema.<br>• <strong>C3:</strong> Projeto de texto (seus argumentos conversam?).<br>• <strong>C4:</strong> Use conectivos (Nesse viés, Ademais, Portanto) em todo início de parágrafo.", type: "review", xp: 400 }
+                    { id: 301, title: "Simulado Cronometrado (TRI)", image: "./assets/img/lvl3-1.png", desc: "Prova 2021 completa. <strong>Tempo rígido: 5h30min.</strong><br><br>• Use máscara (se quiser simular o pior cenário).<br>• Sem pausas para celular.<br>• Água e lanche na mesa.<br>• Sinta o cansaço e aprenda a lidar com ele.", type: "exam", xp: 600, duration: "5h 30min" },
+                    { id: 302, title: "A Arte de Pular (TRI)", image: "./assets/img/lvl3-2.png", desc: "O ENEM usa a Teoria de Resposta ao Item. Acertar difícil e errar fácil abaixa sua nota.<br><br><strong>Técnica das 3 Passadas:</strong><br>1. Leia e faça as fáceis imediatamente.<br>2. Marque as médias para fazer depois.<br>3. As difíceis/trabalhosas ficam pro final (ou chute consciente).<br><strong>Nunca trave mais de 3 min numa questão.</strong>", type: "strategy", xp: 300, duration: "40min" },
+                    { id: 303, title: "Redação: O Pulo pro 900+", image: "./assets/img/lvl3-3.png", desc: "Refine suas competências:<br><br>• <strong>C1:</strong> Crase, vírgula e concordância.<br>• <strong>C2:</strong> Não tangencie o tema.<br>• <strong>C3:</strong> Projeto de texto (seus argumentos conversam?).<br>• <strong>C4:</strong> Use conectivos (Nesse viés, Ademais, Portanto) em todo início de parágrafo.", type: "review", xp: 400, duration: "1h 30min" }
                 ]
             },
             {
@@ -1114,9 +1275,9 @@
                 desc: "Refinamento final. Transforme fraquezas em pontos.",
                 baseScore: 760,
                 missions: [
-                    { id: 401, title: "Maratona de Resistência", image: "./assets/img/lvl4-1.png", desc: "Simule um final de semana real (Sábado e Domingo seguidos).<br><br>O objetivo aqui é físico e mental. Teste qual lanche te dá energia sem dar sono. Teste sua postura na cadeira. A dor nas costas tira mais pontos que a falta de estudo.", type: "exam", xp: 1000 },
-                    { id: 402, title: "Revisão Espaçada Total", image: "./assets/img/lvl4-2.png", desc: "Pegue todos os seus flashcards e resumos.<br><br>A Curva do Esquecimento é cruel. O que você estudou no Nível 1 já está sumindo. Traga tudo de volta à memória de curto prazo agora.", type: "review", xp: 500 },
-                    { id: 403, title: "O Caderno de Erros", image: "./assets/img/lvl4-3.png", desc: "Pegue suas planilhas de erros dos Níveis 1, 2 e 3.<br><br><strong>Refaça APENAS as questões que você errou.</strong><br>Entender um erro antigo vale por 10 acertos novos. Transforme sua maior fraqueza em força.", type: "strategy", xp: 600 }
+                    { id: 401, title: "Maratona de Resistência", image: "./assets/img/lvl4-1.png", desc: "Simule um final de semana real (Sábado e Domingo seguidos).<br><br>O objetivo aqui é físico e mental. Teste qual lanche te dá energia sem dar sono. Teste sua postura na cadeira. A dor nas costas tira mais pontos que a falta de estudo.", type: "exam", xp: 1000, duration: "2 Dias" },
+                    { id: 402, title: "Revisão Espaçada Total", image: "./assets/img/lvl4-2.png", desc: "Pegue todos os seus flashcards e resumos.<br><br>A Curva do Esquecimento é cruel. O que você estudou no Nível 1 já está sumindo. Traga tudo de volta à memória de curto prazo agora.", type: "review", xp: 500, duration: "3h" },
+                    { id: 403, title: "O Caderno de Erros", image: "./assets/img/lvl4-3.png", desc: "Pegue suas planilhas de erros dos Níveis 1, 2 e 3.<br><br><strong>Refaça APENAS as questões que você errou.</strong><br>Entender um erro antigo vale por 10 acertos novos. Transforme sua maior fraqueza em força.", type: "strategy", xp: 600, duration: "2h" }
                 ]
             },
             {
@@ -1125,9 +1286,9 @@
                 desc: "O trabalho duro já foi feito. Agora é controle emocional.",
                 baseScore: 800,
                 missions: [
-                    { id: 501, title: "Polimento Final", image: "./assets/img/lvl5-1.png", desc: "<strong>Proibido aprender matéria nova.</strong> Isso só gera ansiedade.<br><br>Apenas releia fórmulas, conceitos chave e repertórios de redação. Confie no que você já construiu.", type: "review", xp: 200 },
-                    { id: 502, title: "Kit de Sobrevivência", image: "./assets/img/missao-502.png", desc: "• Caneta preta tubo transparente (leve 3).<br>• Documento original com foto.<br>• Cartão de confirmação impresso.<br>• Água sem rótulo.<br>• Lanche prático (chocolate amargo, castanhas).<br>• Verifique o trajeto no Google Maps.", type: "strategy", xp: 100 },
-                    { id: 503, title: "O Dia Zero", image: "./assets/img/missao-503.png", desc: "Sábado pré-prova.<br><br><strong>ZERO ESTUDO.</strong><br>Seu cérebro precisa consolidar as sinapses. Veja um filme leve, coma algo saudável, durma cedo. A prova é amanhã e você está pronto.", type: "strategy", xp: 500 }
+                    { id: 501, title: "Polimento Final", image: "./assets/img/lvl5-1.png", desc: "<strong>Proibido aprender matéria nova.</strong> Isso só gera ansiedade.<br><br>Apenas releia fórmulas, conceitos chave e repertórios de redação. Confie no que você já construiu.", type: "review", xp: 200, duration: "1h" },
+                    { id: 502, title: "Kit de Sobrevivência", image: "./assets/img/lvl5-2.png", desc: "• Caneta preta tubo transparente (leve 3).<br>• Documento original com foto.<br>• Cartão de confirmação impresso.<br>• Água sem rótulo.<br>• Lanche prático (chocolate amargo, castanhas).<br>• Verifique o trajeto no Google Maps.", type: "strategy", xp: 100, duration: "30min" },
+                    { id: 503, title: "O Dia Zero", image: "./assets/img/lvl5-3.png", desc: "Sábado pré-prova.<br><br><strong>ZERO ESTUDO.</strong><br>Seu cérebro precisa consolidar as sinapses. Veja um filme leve, coma algo saudável, durma cedo. A prova é amanhã e você está pronto.", type: "strategy", xp: 500, duration: "1 Dia" }
                 ]
             },
             {
@@ -1136,8 +1297,8 @@
                 desc: "Prove que você está pronto. Simulado compacto e Redação.",
                 baseScore: 999, // Código para Aprovado
                 missions: [
-                    { id: 601, title: "Simulado Compacto (30 Questões)", image: "./assets/img/missao-601.png", desc: "Um teste rápido cobrindo as 4 áreas do conhecimento. Clique para iniciar o quiz interativo.", type: "boss", xp: 2000 },
-                    { id: 602, title: "Redação Final: IA e Sociedade", image: "./assets/img/missao-602.png", desc: "<strong>Tema:</strong> 'Os desafios éticos e sociais da Inteligência Artificial no mercado de trabalho brasileiro.'<br><br>Escreva sua redação final cronometrando 1 hora. Use repertórios como 'Revolução Industrial', 'Black Mirror' ou 'Zygmunt Bauman'.", type: "boss", xp: 1000 }
+                    { id: 601, title: "Simulado Compacto (30 Questões)", image: "./assets/img/lvl6-1.png", desc: "Um teste rápido cobrindo as 4 áreas do conhecimento. Clique para iniciar o quiz interativo.", type: "boss", xp: 2000, duration: "1h" },
+                    { id: 602, title: "Redação Final: IA e Sociedade", image: "./assets/img/lvl6-2.png", desc: "<strong>Tema:</strong> 'Os desafios éticos e sociais da Inteligência Artificial no mercado de trabalho brasileiro.'<br><br>Escreva sua redação final cronometrando 1 hora. Use repertórios como 'Revolução Industrial', 'Black Mirror' ou 'Zygmunt Bauman'.", type: "boss", xp: 1000, duration: "1h" }
                 ]
             }
         ];
@@ -1492,7 +1653,9 @@
                 card.onclick = () => playVideo(video);
                 
                 card.innerHTML = `
-                    <img src="${thumbSrc}" class="video-thumb" alt="${video.title}">
+                    <div class="video-thumb-wrapper">
+                        <img src="${thumbSrc}" class="video-thumb" alt="${video.title}">
+                    </div>
                     <div class="video-info">
                         <div class="video-title">${video.title}</div>
                         <div class="video-meta">${video.channel}</div>
@@ -1507,8 +1670,10 @@
             if (!ytId) return window.open(video.url, '_blank'); // Fallback se não for YouTube
 
             document.getElementById('video-player-title').innerText = video.title;
-            document.getElementById('video-player-desc').innerText = video.desc || `Vídeo do canal ${video.channel}`;
-            document.getElementById('video-iframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1`;
+            document.getElementById('video-player-channel').innerText = video.channel;
+            document.getElementById('video-player-desc').innerText = video.desc || `Assista ao vídeo completo no YouTube.`;
+            // Parâmetros para um player mais limpo: sem vídeos relacionados de outros canais e sem a barra de informações superior
+            document.getElementById('video-iframe').src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&showinfo=0`;
             document.getElementById('video-player-modal').style.display = 'flex';
         }
 
@@ -1538,6 +1703,8 @@
             const container = document.getElementById('timeline-container');
             container.innerHTML = '';
 
+            let previousMissionCompleted = true; // A primeira missão começa liberada
+
             LEVELS.forEach(level => {
                 // Determinar estado do nível (bloqueado, ativo, completo)
                 // Simplificação: Nível do usuário determina visibilidade
@@ -1559,17 +1726,28 @@
                 let missionsHTML = '';
                 level.missions.forEach(mission => {
                     const isDone = gameState.completedMissions.includes(mission.id);
+                    const isLocked = !previousMissionCompleted;
+
+                    // Atualiza o estado para a próxima iteração
+                    if (isDone) {
+                        previousMissionCompleted = true;
+                    } else {
+                        previousMissionCompleted = false; // A próxima estará bloqueada
+                    }
+
                     const doneClass = isDone ? 'done' : '';
+                    const lockedClass = isLocked ? 'locked' : '';
                     const percentText = isDone ? '100%' : '0%';
                     const imgSrc = mission.image;
                     
                     missionsHTML += `
-                        <div class="mission-card ${doneClass}" onclick="openMission(${mission.id})">
+                        <div class="mission-card ${doneClass} ${lockedClass}" onclick="openMission(${mission.id})">
                             <img src="${imgSrc}" class="mission-img" alt="Mission Cover">
                             <div class="mission-content">
                                 <div>
                                     <div class="mission-header">
                                         <span class="tag ${mission.type}">${mission.type}</span>
+                                        <div class="mission-duration">⏱ <span>${mission.duration}</span></div>
                                     </div>
                                     <h4 style="color: #fff; margin-bottom: 0.3rem; font-size: 1rem; line-height: 1.4;">${mission.title}</h4>
                                 </div>
