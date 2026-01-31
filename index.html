@@ -61,6 +61,17 @@
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .logo-text {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
@@ -89,6 +100,20 @@
             gap: 0.5rem;
         }
 
+        .streak-box {
+            background: rgba(255, 69, 0, 0.2);
+            border: 1px solid #ff4500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            color: #ff4500;
+            box-shadow: 0 0 10px rgba(255, 69, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+        }
+
         .user-mini {
             display: flex;
             align-items: center;
@@ -115,9 +140,24 @@
             width: 100%;
             margin: 0;
             padding: 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid var(--primary); /* Borda Neon */
+            box-shadow: 0 10px 40px rgba(0, 243, 255, 0.15); /* Glow Neon Ambiente */
         }
 
-        .banner-box {
+        .banner-slider {
+            display: flex;
+            width: 300%; /* 3 Banners = 300% de largura */
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .banner-slide {
+            width: 33.333%;
+            position: relative;
+        }
+
+        .banner-slide img {
             width: 100%;
             height: auto;
             background: #000;
@@ -129,7 +169,8 @@
         }
 
         /* Efeito Scanline (Textura Cyberpunk sutil) */
-        .banner-box::before {
+        /* Efeito Scanline em cada slide */
+        .banner-slide::before {
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -139,13 +180,40 @@
         }
 
         /* Efeito de degradê na base para integrar o banner ao fundo */
-        .banner-box::after {
+        /* Degradê na base */
+        .banner-slide::after {
             content: '';
             position: absolute;
             bottom: 0; left: 0; width: 100%; height: 80px;
             background: linear-gradient(to top, var(--bg-dark), transparent);
             pointer-events: none;
             z-index: 2;
+        }
+
+        .banner-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            transform: scale(1.2);
         }
 
         /* --- LAYOUT PRINCIPAL --- */
@@ -419,10 +487,8 @@
         /* --- GRID DE MISSÕES (NOVO LAYOUT) --- */
         .missions-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 colunas no desktop */
-            gap: 1.5rem;
-            /* Layout responsivo que cria colunas de no mínimo 260px, evitando que fiquem esticadas ou espremidas */
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            /* LARGURA: O valor '260px' define a largura mínima. Aumente para cards mais largos. */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 2rem; /* Aumenta o espaçamento entre os cards */
             margin-top: 1rem;
         }
@@ -434,7 +500,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 0; /* Remove padding para a imagem encostar na borda */
-            height: 380px; /* Altura aumentada para estilo "Post/Retrato" */
+            height: 450px; /* ALTURA: Defina a altura fixa do card aqui */
             padding: 0;
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             cursor: pointer;
@@ -484,7 +550,7 @@
         .mission-img {
             width: 100%;
             height: 240px; /* Imagem bem maior (destaque) */
-            height: 200px; /* Altura da imagem ajustada para melhor proporção */
+            height: 300px; /* Altura da imagem ajustada para melhor proporção */
             object-fit: cover;
             background: #222;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -854,7 +920,8 @@
             
             /* Header Compacto */
             header { flex-direction: column; padding: 1rem; gap: 1rem; height: auto; }
-            .logo { font-size: 1rem; }
+            .logo-text { font-size: 1rem; }
+            .logo img { height: 50px; }
             .hud-stats { width: 100%; justify-content: center; gap: 1.5rem; }
             .timer-box { font-size: 0.75rem; padding: 0.3rem 0.5rem; }
             #user-name-display { font-size: 0.9rem; }
@@ -955,15 +1022,84 @@
         /* Telas muito pequenas (iPhone SE, etc) */
         @media (max-width: 480px) {
             .missions-grid {
-                grid-template-columns: repeat(1, 1fr); /* Força 1 coluna nas tarefas para melhor leitura */
+                grid-template-columns: repeat(2, 1fr); /* Força 1 coluna nas tarefas para melhor leitura */
+            }
+            .mission-card {
+                height: 350px;
+            }
+            .mission-img {
+                height: 200px;
             }
             /* O grid de missões já se ajusta para 1 coluna naturalmente com auto-fit */
         }
 
-        @media (max-width: 350px) {
+        @media (max-width: 360px) {
+            .mission-content h4{
+                font-size: 12px;
+            }
+            .missions-grid {
+                gap: 5px;
+            }
+            .mission-header {
+                flex-direction: column;
+                gap: 2px;
+            }
+            .mission-desc-box {
+                font-size: 14px;
+            }
+            .mission-reward-value {
+                font-size: 15px;
+            }
+            .name-recompensa {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 325px) {
+            /* aqui vamo fazer o curso quando estiver quebrando fazer ir para de baixo no perfil e nome */
+            .profile-header-large {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 300px) {
             .missions-grid {
                 grid-template-columns: repeat(1, 1fr);
+
             }
+            .mission-content h4 {
+                font-size: 16px;
+            }
+        }
+
+        /* --- AJUSTES BANNER MOBILE --- */
+        @media (max-width: 768px) {
+            .banner-slide img {
+                height: 180px; /* Altura fixa para não ficar muito fino */
+                object-fit: cover; /* Corta as laterais para preencher a altura */
+            }
+            .banner-indicators {
+                bottom: 10px; /* Mais próximo da borda */
+            }
+            .dot { width: 8px; height: 8px; } /* Bolinhas menores */
+        }
+
+        /* --- CONFETTI --- */
+        .confetti {
+            position: fixed;
+            top: -20px;
+            z-index: 9999;
+            border-radius: 2px;
+            pointer-events: none;
+            animation: confettiFall linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
     </style>
 </head>
@@ -971,8 +1107,14 @@
 
     <!-- HEADER / HUD -->
     <header>
-        <div class="logo">ENEM<span style="color:white">QUEST</span></div>
+        <div class="logo">
+            <img src="./assets/img/logo-do-site.png" alt="Logo">
+            <span class="logo-text">ENEM<span style="color:white">QUEST</span></span>
+        </div>
         <div class="hud-stats">
+            <div class="streak-box" title="Dias seguidos estudando">
+                🔥 <span id="streak-count">0</span>
+            </div>
             <div class="timer-box" id="countdown">
                 ⌛ <span id="days-left">000</span> DIAS
             </div>
@@ -985,8 +1127,21 @@
 
     <!-- ESPAÇO PARA O BANNER -->
     <div class="banner-container">
-        <div class="banner-box">
-            <img src="./assets/img/banner.png" style="width: 100%; height: auto; display: block;" alt="Banner Principal">
+        <div class="banner-slider" id="banner-slider">
+            <div class="banner-slide">
+                <img src="./assets/img/banner.png" alt="Banner 1">
+            </div>
+            <div class="banner-slide">
+                <img src="./assets/img/banner-2.png" alt="Banner 2">
+            </div>
+            <div class="banner-slide">
+                <img src="./assets/img/banner-3.png" alt="Banner 3">
+            </div>
+        </div>
+        <div class="banner-indicators">
+            <div class="dot active" onclick="goToBanner(0)"></div>
+            <div class="dot" onclick="goToBanner(1)"></div>
+            <div class="dot" onclick="goToBanner(2)"></div>
         </div>
     </div>
 
@@ -1060,8 +1215,8 @@
             <div id="modal-desc" class="mission-desc-box">Descrição detalhada...</div>
             
             <div class="mission-reward-box">
-                <div style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem;">
-                    <span style="font-size: 1.5rem;">🏆</span> RECOMPENSA
+                <div class="name-recompensa" style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); text-transform: uppercase;">
+                    <span>🏆</span> RECOMPENSA
                 </div>
                 <div class="mission-reward-value">
                     +<span id="modal-xp">100</span> XP
@@ -1243,7 +1398,8 @@
                     { id: 101, title: "Simulado Diagnóstico (Raio-X)", image: "./assets/img/tarefa1.png", desc: "<strong>Objetivo:</strong> Entender seu nível atual sem pressão de tempo.<br><br>1. Imprima a prova do ENEM 2020 (Dia 1).<br>2. Faça em ambiente silencioso, mas <strong>sem cronômetro</strong>.<br>3. Seja honesto: não chute. Se não sabe, deixe em branco.<br>4. Este resultado será seu 'Ponto Zero' para medir evolução.", type: "exam", xp: 500, duration: "4h 30min" },
                     { id: 102, title: "Mapeamento de Lacunas", image: "./assets/img/tarefa2.png", desc: "<strong>Não basta corrigir!</strong> Crie uma planilha com 3 colunas para cada erro:<br><br>1. <strong>Conteúdo:</strong> Eu não sabia a matéria?<br>2. <strong>Interpretação:</strong> Eu sabia, mas não entendi o texto?<br>3. <strong>Atenção:</strong> Errei conta ou leitura rápida?<br><br><em>Dica: Ataque primeiro os erros de conteúdo base.</em>", type: "strategy", xp: 200, duration: "1h" },
                     { id: 103, title: "O Cronograma Realista", image: "./assets/img/tarefa3.png", desc: "Esqueça cronogramas de 12h. Monte um sustentável:<br><br>• Defina <strong>Blocos de Estudo</strong> de 1h30min.<br>• Intercale matérias opostas (ex: Mat e Hist) para descansar o cérebro.<br>• Deixe o domingo livre ou para simulados.<br>• <strong>Meta:</strong> Cumprir 80% do planejado é melhor que 0% do perfeito.", type: "strategy", xp: 150, duration: "45min" },
-                    { id: 104, title: "Matemática: O Alicerce", image: "./assets/img/tarefa4.png", desc: "O ENEM ama o básico. Antes de Logaritmo, domine:<br><br>✅ Regra de Três (Simples e Composta)<br>✅ Porcentagem e Juros<br>✅ Frações e Decimais<br>✅ Conversão de Unidades (km para m, h para s)<br><br><strong>Missão:</strong> Resolver 50 questões apenas desses temas.", type: "review", xp: 300, duration: "2h" }
+                    { id: 104, title: "Matemática: O Alicerce", image: "./assets/img/tarefa4.png", desc: "O ENEM ama o básico. Antes de Logaritmo, domine:<br><br>✅ Regra de Três (Simples e Composta)<br>✅ Porcentagem e Juros<br>✅ Frações e Decimais<br>✅ Conversão de Unidades (km para m, h para s)<br><br><strong>Missão:</strong> Resolver 50 questões apenas desses temas.", type: "review", xp: 300, duration: "2h" },
+                    { id: 105, title: "Desvendando a Redação", image: "./assets/img/lvl1-5.png", desc: "<strong>O Primeiro Passo:</strong> Entenda o que é o texto dissertativo-argumentativo.<br><br>1. <strong>Estrutura:</strong> Introdução, Desenvolvimento (2 parágrafos) e Conclusão.<br>2. <strong>Competências:</strong> Leia sobre as 5 competências avaliadas.<br>3. <strong>Leitura:</strong> Leia 3 redações nota 1000 de anos anteriores para ver o padrão.", type: "review", xp: 250, duration: "1h" }
                 ]
             },
             {
@@ -1347,10 +1503,12 @@
                 avatar: "👨‍🎓",
                 themeColor: "linear-gradient(45deg, #00f3ff, #bc13fe)",
                 level: 1, 
-                xp: 0 
+                xp: 0
             },
             completedMissions: [], // Array de IDs
-            startDate: new Date().toISOString()
+            startDate: new Date().toISOString(),
+            streak: 0,
+            lastLogin: null
         };
 
         // Carregar do LocalStorage
@@ -1368,12 +1526,42 @@
                 // Primeiro acesso
                 document.body.classList.add('no-scroll');
             }
+            checkStreak(); // Verifica a sequência de dias
             updateUI();
         }
 
         function saveGame() {
             localStorage.setItem('enemGameSave', JSON.stringify(gameState));
             updateUI();
+        }
+
+        /* --- SISTEMA DE STREAK (DIAS SEGUIDOS) --- */
+        function checkStreak() {
+            const today = new Date().toDateString(); // Ex: "Sat Jan 31 2026"
+            
+            // Se for o primeiro acesso de todos
+            if (!gameState.lastLogin) {
+                gameState.streak = 1;
+                gameState.lastLogin = today;
+                saveGame();
+                return;
+            }
+
+            // Se já logou hoje, não faz nada
+            if (gameState.lastLogin === today) return;
+
+            // Verifica se o último login foi ontem
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (gameState.lastLogin === yesterday.toDateString()) {
+                gameState.streak = (gameState.streak || 0) + 1;
+            } else {
+                gameState.streak = 1; // Quebrou a sequência (reset)
+            }
+
+            gameState.lastLogin = today;
+            saveGame();
         }
 
         /* --- LÓGICA DO JOGO --- */
@@ -1412,6 +1600,7 @@
             document.getElementById('current-level').innerText = gameState.user.level;
             document.getElementById('total-xp').innerText = gameState.user.xp;
             document.getElementById('missions-completed').innerText = gameState.completedMissions.length;
+            document.getElementById('streak-count').innerText = gameState.streak || 0;
 
             // Progresso Global
             const totalMissions = LEVELS.reduce((acc, lvl) => acc + lvl.missions.length, 0);
@@ -1749,7 +1938,7 @@
                                         <span class="tag ${mission.type}">${mission.type}</span>
                                         <div class="mission-duration">⏱ <span>${mission.duration}</span></div>
                                     </div>
-                                    <h4 style="color: #fff; margin-bottom: 0.3rem; font-size: 1rem; line-height: 1.4;">${mission.title}</h4>
+                                    <h4 style="color: #fff; margin-bottom: 0.3rem; line-height: 1.4;">${mission.title}</h4>
                                 </div>
                                 <div class="mission-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
                                     <span style="color: var(--success); font-size: 0.8rem;">+${mission.xp} XP</span>
@@ -1861,6 +2050,7 @@
                 // Marcar como feito
                 gameState.completedMissions.push(mission.id);
                 gameState.user.xp += mission.xp;
+                checkLevelCompletion(mission.id);
             } else {
                 // Desmarcar
                 gameState.completedMissions.splice(index, 1);
@@ -1869,6 +2059,35 @@
             
             saveGame();
             closeModal();
+        }
+
+        function checkLevelCompletion(missionId) {
+            const level = LEVELS.find(l => l.missions.some(m => m.id === missionId));
+            if(!level) return;
+            
+            const allDone = level.missions.every(m => gameState.completedMissions.includes(m.id));
+            if(allDone) {
+                fireConfetti();
+            }
+        }
+
+        function fireConfetti() {
+            const colors = ['#00f3ff', '#bc13fe', '#00ff9d', '#ffd700', '#ffffff'];
+            const confettiCount = 100;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const el = document.createElement('div');
+                el.classList.add('confetti');
+                const bg = colors[Math.floor(Math.random() * colors.length)];
+                el.style.backgroundColor = bg;
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.width = (Math.random() * 8 + 5) + 'px';
+                el.style.height = el.style.width;
+                el.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 5000);
+            }
         }
 
         /* --- LÓGICA DO QUIZ --- */
@@ -1953,11 +2172,40 @@
             document.getElementById('levelup-modal').style.display = 'none';
         }
 
+        /* --- CAROUSEL BANNER LOGIC --- */
+        let currentBanner = 0;
+        let bannerInterval;
+
+        function updateBannerUI() {
+            const slider = document.getElementById('banner-slider');
+            const dots = document.querySelectorAll('.dot');
+            
+            // Move o slider (0%, -33.33%, -66.66%)
+            slider.style.transform = `translateX(-${currentBanner * (100/3)}%)`;
+            
+            // Atualiza bolinhas
+            dots.forEach((d, i) => d.classList.toggle('active', i === currentBanner));
+        }
+
+        function nextBanner() {
+            currentBanner = (currentBanner + 1) % 3; // Alterna entre 0, 1 e 2
+            updateBannerUI();
+        }
+
+        function goToBanner(index) {
+            currentBanner = index;
+            updateBannerUI();
+            // Reinicia o timer para não pular logo em seguida
+            clearInterval(bannerInterval);
+            bannerInterval = setInterval(nextBanner, 4000);
+        }
+
         /* --- INICIALIZAÇÃO --- */
         window.onload = () => {
             loadGame();
             updateCountdown();
             setInterval(updateCountdown, 60000); // Atualiza timer a cada minuto
+            bannerInterval = setInterval(nextBanner, 4000); // Inicia o carrossel
         };
 
     </script>
